@@ -779,7 +779,17 @@ class MainFrame(wx.Frame):
         for i in range(len(data.group_cols)):
             if len(data.group_cols[i]) > 0: ind.append(i)
         self.choice_1.Clear()
-        groups=array([', '.join(data.groups[i]) for i in range(len(data.groups))])
+        groups = array([', '.join(data.groups[i]) for i in range(len(data.groups))])
+        print groups
+        print groups.tolist()
+        newgroups = []
+        for setting in groups.tolist():
+            tmpstr = ""
+            for i, entry in enumerate(setting.split(", ")):
+                tmpstr += data.factors[i] + " = " + entry + "; "
+            newgroups.append(tmpstr.rstrip("; "))
+        print newgroups
+        groups = array(newgroups)
         if len(groups[ind]) > 0 :
             self.choice_1.AppendItems(groups[ind].tolist())
         for i in range(len(ind)):
