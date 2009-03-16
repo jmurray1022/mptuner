@@ -870,7 +870,6 @@ class MainFrame(wx.Frame):
         if dlg.ShowModal() == wx.ID_OK:
             path = dlg.GetPath()
             self.canvas.print_figure(path, dpi=self.dpi)
-            #self.flash_status_message("Saved to %s" % path)
         
 
     def OnPlotOptions(self, event): # wxGlade: MainFrame.<event_handler>
@@ -970,9 +969,12 @@ class MainFrame(wx.Frame):
         # Show the dialog and retrieve the user response. If it is the OK response, 
         # process the data.
         if dlg.ShowModal() == wx.ID_OK:
+            global data
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
-            print paths
+            #print paths
+            data = DataObj(paths[0])
+            data.cols = arange(data.data.shape[1])
         # Destroy the dialog. Don't do this until you are done with it!
         # BAD things can happen otherwise!
         dlg.Destroy()
@@ -989,8 +991,8 @@ if __name__ == "__main__":
             
     app = wx.PySimpleApp(0)
     wx.InitAllImageHandlers()
-    data=DataObj('35cm.csv')
-    data.cols=arange(data.data.shape[1])
+    #data = DataObj('35cm.csv')
+    #data.cols = arange(data.data.shape[1])
     #data.data[4,1]=NaN
     frame_1 = MainFrame(None, -1, "")
     frame_1.panel_4.Hide()
