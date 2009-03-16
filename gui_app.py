@@ -40,7 +40,7 @@ class PlotOptions(wx.Frame):
 
         self.Bind(wx.EVT_BUTTON, self.OnApply, self.Apply)
         self.Bind(wx.EVT_BUTTON, self.OnClear, self.Clear)
-        # end wxGlade
+        # end wxGlade    
 
     def __set_properties(self):
         # begin wxGlade: PlotOptions.__set_properties
@@ -95,12 +95,12 @@ class PlotOptions(wx.Frame):
     def OnApply(self, event): # wxGlade: PlotOptions.<event_handler>
         frame_1.titletext = frame_1.fig.suptitle(self.TitleTB.GetValue())
         frame_1.canvas.draw()
-        event.Skip()
+        
 
     def OnClear(self, event): # wxGlade: PlotOptions.<event_handler>
         frame_1.titletext.set_visible(False)
         frame_1.canvas.draw()
-        event.Skip()
+        
 
 # end of class PlotOptions
 
@@ -172,7 +172,7 @@ class GroupFrame(wx.Frame):
 
     def OnSaveGroup(self, event): # wxGlade: GroupFrame.<event_handler>
         print "Event handler `OnSaveGroup' not implemented!"
-        event.Skip()
+        
         
     def OnCBCheck(self, event):
         names=[]
@@ -215,7 +215,7 @@ class GroupFrame(wx.Frame):
             #print ["Group " + str(i) + ": " + names[j] + " = " + data.groups[i,j] for j in range(len(names))]
             #self.ResultLB.
         #print populate
-        event.Skip()
+        
 
 # end of class GroupFrame
 
@@ -304,7 +304,7 @@ class DataImportFrame(wx.Frame):
         data.factors=self.factor_lb.GetItems()
         data.settings=dict((data.factors[i], sorted(list(set(data.colsettings[:,i])), ncmp)) for i in range(len(data.factors)))
         #print data.settings
-        event.Skip()
+        
 
     def OnFactorSelect(self, event): # wxGlade: DataImportFrame.<event_handler>
         self.setting_lb.Clear()
@@ -317,14 +317,14 @@ class DataImportFrame(wx.Frame):
             settings.sort()
         self.setting_lb.AppendItems(settings)
         self.name_tc.SetValue(event.GetString())
-        event.Skip()
+        
 
     def OnNameEdit(self, event): # wxGlade: DataImportFrame.<event_handler>
         self.factor_lb.SetString(self.factor_lb.GetSelection(), event.GetString())
         if event.GetString() != "":
             data.factors=self.factor_lb.GetItems()
             data.settings=dict((data.factors[i], sorted(list(set(data.colsettings[:,i])), ncmp)) for i in range(len(data.factors)))
-        event.Skip()
+        
 
     def OnSaveFactorDefs(self, event): # wxGlade: DataImportFrame.<event_handler>
         # Create the dialog. In this case the current directory is forced as the starting
@@ -376,7 +376,7 @@ class DataImportFrame(wx.Frame):
         # BAD things can happen otherwise!
         dlg.Destroy()
 
-        event.Skip()
+        
 
     def OnLoadFactorDefs(self, event): # wxGlade: DataImportFrame.<event_handler>
         wildcard = "Factor definitions file (*.def)|*.def"
@@ -414,7 +414,7 @@ class DataImportFrame(wx.Frame):
         self.factor_lb.Clear()
         self.factor_lb.AppendItems(data.factors)
 
-        event.Skip()
+        
 
 # end of class DataImportFrame
 
@@ -457,7 +457,7 @@ class CustomTreeCtrl(CT.CustomTreeCtrl):
             cols=np.intersect1d(cols,list)
         print cols
         data.cols=cols
-        event.Skip()
+        
         
     def clear_filter(self):
         self.filter = dict([(factor, []) for factor in Factors])
@@ -749,11 +749,11 @@ class MainFrame(wx.Frame):
             s['ce'] = self.ceText.GetValue()
             self.choice_1.SetClientData(i, s)
         
-        event.Skip()
+        
         
     def BuildPlot(self):
-        yl=self.axes.get_ylim().copy()
-        xl=self.axes.get_xlim().copy()
+        yl=self.axes.get_ylim()#.copy()
+        xl=self.axes.get_xlim()#.copy()
         #print xl, yl
         if self.ShowBadTraces.IsChecked():
             self.draw_plot(data.ind, ma.masked_invalid(data.data[:,data.cols]),clear=True,bad_data=True)
@@ -772,7 +772,7 @@ class MainFrame(wx.Frame):
 
     def onClose(self, event): # wxGlade: MainFrame.<event_handler>
         self.Destroy()
-        event.Skip()
+        
         
     def onFocus(self):
         ind = []
@@ -793,6 +793,15 @@ class MainFrame(wx.Frame):
             }
             #self.choice_1.SetClientData(i, ind[i])
             self.choice_1.SetClientData(i, d)
+            alldict = {'method':0,
+             'frame':16,
+             'lag':16,
+             'cs':1.5,
+             'ce':3.0,
+             'p':0.0,
+             'index':-1
+            }
+        self.choice_1.Insert("Show all (no factor grouping)", 0, alldict)
 
     def onAbout(self, event): # wxGlade: MainFrame.<event_handler>
         msg = """ MPTuner version 0.90\n
@@ -801,26 +810,26 @@ class MainFrame(wx.Frame):
         dlg = wx.MessageDialog(self, msg, "About", wx.OK)
         dlg.ShowModal()
         dlg.Destroy()
-        event.Skip()
+        
 
     def onSlide(self, event): # wxGlade: MainFrame.<event_handler>
         self.csText.SetValue(float(self.csSlider.GetValue())/1000)
         self.ceText.SetValue(float(self.ceSlider.GetValue())/1000)
-        event.Skip()
+        
 
     def onTextEdit(self, event): # wxGlade: MainFrame.<event_handler>
         self.csSlider.SetValue(self.csText.GetValue()*1000)
         self.ceSlider.SetValue(self.ceText.GetValue()*1000)
-        event.Skip()
+        
 
     def OnPlotOptionApply(self, event): # wxGlade: MainFrame.<event_handler>
         print "Event handler `OnPlotOptionApply' not implemented"
-        event.Skip()
+        
 
     def onGroupMenu(self, event): # wxGlade: MainFrame.<event_handler>
         Group=FactorFrame(frame_1, -1, "")
-        Group.Show()
-        event.Skip()
+        #Group.Show()
+        
 
     def onApplyFilter(self, event): # wxGlade: MainFrame.<event_handler>
         self.tree.clear_filter()
@@ -835,7 +844,7 @@ class MainFrame(wx.Frame):
             cols=np.intersect1d(cols,list)
         print cols
         data.cols=cols
-        event.Skip()
+        
 
     def OnSavePlot(self, event): # wxGlade: MainFrame.<event_handler>
         file_choices = "PNG (*.png)|*.png"
@@ -852,11 +861,11 @@ class MainFrame(wx.Frame):
             path = dlg.GetPath()
             self.canvas.print_figure(path, dpi=self.dpi)
             #self.flash_status_message("Saved to %s" % path)
-        event.Skip()
+        
 
     def OnPlotOptions(self, event): # wxGlade: MainFrame.<event_handler>
         print "Event handler `OnPlotOptions' not implemented"
-        event.Skip()
+        
 
     def onFilterShow(self, event): # wxGlade: MainFrame.<event_handler>
         if self.filter_hide:
@@ -866,15 +875,15 @@ class MainFrame(wx.Frame):
             self.panel_4.Hide()
             self.filter_hide=True
         self.Layout()
-        event.Skip()
+        
 
     def onFileOpen(self, event): # wxGlade: MainFrame.<event_handler>
         print "Event handler `onFileOpen' not implemented"
-        event.Skip()
+        
 
     def onClearFilter(self, event): # wxGlade: MainFrame.<event_handler>
         print "Event handler `onClearFilter' not implemented"
-        event.Skip()
+        
 
     def onHideFilter(self, event): # wxGlade: MainFrame.<event_handler>
         if self.HideFilterMenu.IsChecked():
@@ -882,28 +891,28 @@ class MainFrame(wx.Frame):
         else:
             self.panel_4.Show()
         self.Layout()
-        event.Skip()
+        
 
     def OnShowDataImport(self, event): # wxGlade: MainFrame.<event_handler>
         data_import=DataImportFrame(frame_1, -1, "")
         app.SetTopWindow(data_import)
         data_import.Show()
-        event.Skip()
+        
 
     def OnShowGroup(self, event): # wxGlade: MainFrame.<event_handler>
         print "Event handler `OnShowGroup' not implemented"
         Group=GroupFrame(frame_1, -1, "")
         app.SetTopWindow(Group)
         Group.Show()
-        event.Skip()
+        
 
     def OnShowBadMarkers(self, event): # wxGlade: MainFrame.<event_handler>
         self.BuildPlot()
-        event.Skip()
+        
 
     def OnShowBadTraces(self, event): # wxGlade: MainFrame.<event_handler>
         self.BuildPlot()
-        event.Skip()
+        
 
     def OnSetPlotParams(self, event): # wxGlade: MainFrame.<event_handler>
         #print "Event handler `OnSetPlotParams' not implemented"
@@ -914,11 +923,13 @@ class MainFrame(wx.Frame):
         PlotParam = PlotOptions(frame_1, -1, "a")
         app.SetTopWindow(PlotParam)
         PlotParam.Show()
-        event.Skip()
+        
 
     def OnGroupSelect(self, event): # wxGlade: MainFrame.<event_handler>
-        #self.repolish = True
-        data.cols = data.group_cols[event.GetClientData()['index']]   
+        if event.GetClientData()['index'] == -1:
+            data.cols = np.arange(0,data.data.shape[1])
+        else:
+            data.cols = data.group_cols[event.GetClientData()['index']]   
         i = event.GetSelection()
         if i != -1:
             s = event.GetClientData()
@@ -927,7 +938,7 @@ class MainFrame(wx.Frame):
             self.LagCtrl.SetValue(s['lag'])
             self.csText.SetValue(s['cs'])
             self.ceText.SetValue(s['ce'])
-        event.Skip()
+        
 
     def OnLoadData(self, event): # wxGlade: MainFrame.<event_handler>
         wildcard = "Data file (*.csv)|*.csv"
@@ -956,7 +967,7 @@ class MainFrame(wx.Frame):
         # BAD things can happen otherwise!
         dlg.Destroy()
 
-        event.Skip()
+        
 
 # end of class MainFrame
 
