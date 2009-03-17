@@ -40,7 +40,7 @@ class PlotOptions(wx.Frame):
 
         self.Bind(wx.EVT_BUTTON, self.OnApply, self.Apply)
         self.Bind(wx.EVT_BUTTON, self.OnClear, self.Clear)
-        # end wxGlade    
+        # end wxGlade
 
     def __set_properties(self):
         # begin wxGlade: PlotOptions.__set_properties
@@ -114,6 +114,7 @@ class GroupFrame(wx.Frame):
         self.GroupByCLB = wx.CheckListBox(self.panel_5, -1, choices=[])
         self.label_11 = wx.StaticText(self.panel_5, -1, "Result")
         self.ResultLC = wx.ListCtrl(self.panel_5, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
+
         self.__set_properties()
         self.__do_layout()
         # end wxGlade
@@ -501,35 +502,30 @@ class MainFrame(wx.Frame):
         self.fileMenu.AppendItem(self.FileOpen)
         self.LoadData = wx.MenuItem(self.fileMenu, wx.NewId(), "Load data", "", wx.ITEM_NORMAL)
         self.fileMenu.AppendItem(self.LoadData)
-        self.ShowDataImport = wx.MenuItem(self.fileMenu, wx.NewId(), "Show data import settings", "", wx.ITEM_NORMAL)
-        self.fileMenu.AppendItem(self.ShowDataImport)
-        self.ShowGroupSettings = wx.MenuItem(self.fileMenu, wx.NewId(), "Show group settings", "", wx.ITEM_NORMAL)
-        self.fileMenu.AppendItem(self.ShowGroupSettings)
+        self.SaveData = wx.MenuItem(self.fileMenu, wx.NewId(), "Save data", "", wx.ITEM_NORMAL)
+        self.fileMenu.AppendItem(self.SaveData)
         self.Exit = wx.MenuItem(self.fileMenu, wx.NewId(), "Exit", "Quit MPTuner", wx.ITEM_NORMAL)
         self.fileMenu.AppendItem(self.Exit)
         self.MainFrame_menubar.Append(self.fileMenu, "File")
         self.Plot = wx.Menu()
-        self.SavePlot = wx.MenuItem(self.Plot, wx.NewId(), "Save plot", "", wx.ITEM_NORMAL)
-        self.Plot.AppendItem(self.SavePlot)
-        self.Plot_sub = wx.Menu()
-        self.ShowBadMarkers = wx.MenuItem(self.Plot_sub, wx.NewId(), "Show markers for bad data", "Show black dots for bad data points", wx.ITEM_CHECK)
-        self.Plot_sub.AppendItem(self.ShowBadMarkers)
-        self.ShowBadTraces = wx.MenuItem(self.Plot_sub, wx.NewId(), "Show traces for bad data", "Show dotted lines between bad data points", wx.ITEM_CHECK)
-        self.Plot_sub.AppendItem(self.ShowBadTraces)
-        self.Plot_sub.AppendSeparator()
-        self.SetPlotParams = wx.MenuItem(self.Plot_sub, wx.NewId(), "Set title/labels", "Add/edit titles and axes labels", wx.ITEM_NORMAL)
-        self.Plot_sub.AppendItem(self.SetPlotParams)
-        self.Plot.AppendMenu(wx.NewId(), "Options", self.Plot_sub, "")
-        self.MainFrame_menubar.Append(self.Plot, "Plot")
-        self.Filter = wx.Menu()
-        self.ApplyFilter = wx.MenuItem(self.Filter, wx.NewId(), "Apply filter", "", wx.ITEM_NORMAL)
-        self.Filter.AppendItem(self.ApplyFilter)
-        self.ClearFilter = wx.MenuItem(self.Filter, wx.NewId(), "Clear filter", "", wx.ITEM_NORMAL)
-        self.Filter.AppendItem(self.ClearFilter)
-        self.Filter.AppendSeparator()
-        self.HideFilterMenu = wx.MenuItem(self.Filter, wx.NewId(), "Hide filter control", "Show/hide the filter control", wx.ITEM_CHECK)
-        self.Filter.AppendItem(self.HideFilterMenu)
-        self.MainFrame_menubar.Append(self.Filter, "Filter")
+        self.ShowDataImport = wx.MenuItem(self.Plot, wx.NewId(), "Show data import settings", "", wx.ITEM_NORMAL)
+        self.Plot.AppendItem(self.ShowDataImport)
+        self.ShowGroupSettings = wx.MenuItem(self.Plot, wx.NewId(), "Show group settings", "", wx.ITEM_NORMAL)
+        self.Plot.AppendItem(self.ShowGroupSettings)
+        self.MainFrame_menubar.Append(self.Plot, "Data")
+        wxglade_tmp_menu = wx.Menu()
+        self.SavePlot = wx.MenuItem(wxglade_tmp_menu, wx.NewId(), "Save plot", "", wx.ITEM_NORMAL)
+        wxglade_tmp_menu.AppendItem(self.SavePlot)
+        wxglade_tmp_menu_sub = wx.Menu()
+        self.ShowBadMarkers = wx.MenuItem(wxglade_tmp_menu_sub, wx.NewId(), "Show markers for bad data", "Show black dots for bad data points", wx.ITEM_CHECK)
+        wxglade_tmp_menu_sub.AppendItem(self.ShowBadMarkers)
+        self.ShowBadTraces = wx.MenuItem(wxglade_tmp_menu_sub, wx.NewId(), "Show traces for bad data", "Show dotted lines between bad data points", wx.ITEM_CHECK)
+        wxglade_tmp_menu_sub.AppendItem(self.ShowBadTraces)
+        wxglade_tmp_menu_sub.AppendSeparator()
+        self.SetPlotParams = wx.MenuItem(wxglade_tmp_menu_sub, wx.NewId(), "Set title/labels", "Add/edit titles and axes labels", wx.ITEM_NORMAL)
+        wxglade_tmp_menu_sub.AppendItem(self.SetPlotParams)
+        wxglade_tmp_menu.AppendMenu(wx.NewId(), "Options", wxglade_tmp_menu_sub, "")
+        self.MainFrame_menubar.Append(wxglade_tmp_menu, "Plot")
         self.helpMenu = wx.Menu()
         self.About = wx.MenuItem(self.helpMenu, wx.NewId(), "About", "", wx.ITEM_NORMAL)
         self.helpMenu.AppendItem(self.About)
@@ -559,16 +555,14 @@ class MainFrame(wx.Frame):
 
         self.Bind(wx.EVT_MENU, self.onFileOpen, self.FileOpen)
         self.Bind(wx.EVT_MENU, self.OnLoadData, self.LoadData)
+        self.Bind(wx.EVT_MENU, self.OnSaveData, self.SaveData)
+        self.Bind(wx.EVT_MENU, self.onClose, self.Exit)
         self.Bind(wx.EVT_MENU, self.OnShowDataImport, self.ShowDataImport)
         self.Bind(wx.EVT_MENU, self.OnShowGroup, self.ShowGroupSettings)
-        self.Bind(wx.EVT_MENU, self.onClose, self.Exit)
         self.Bind(wx.EVT_MENU, self.OnSavePlot, self.SavePlot)
         self.Bind(wx.EVT_MENU, self.OnShowBadMarkers, self.ShowBadMarkers)
         self.Bind(wx.EVT_MENU, self.OnShowBadTraces, self.ShowBadTraces)
         self.Bind(wx.EVT_MENU, self.OnSetPlotParams, self.SetPlotParams)
-        self.Bind(wx.EVT_MENU, self.onApplyFilter, self.ApplyFilter)
-        self.Bind(wx.EVT_MENU, self.onClearFilter, self.ClearFilter)
-        self.Bind(wx.EVT_MENU, self.onHideFilter, self.HideFilterMenu)
         self.Bind(wx.EVT_MENU, self.onAbout, self.About)
         self.Bind(wx.EVT_CHOICE, self.OnGroupSelect, self.choice_1)
         self.Bind(wx.EVT_COMMAND_SCROLL, self.onSlide, self.csSlider)
@@ -971,6 +965,26 @@ class MainFrame(wx.Frame):
         dlg.Destroy()
 
         
+
+    def OnSaveData(self, event): # wxGlade: MainFrame.<event_handler>
+        wildcard = "CSV file (*.csv)|*.csv"     
+        
+        dlg = wx.FileDialog(
+            self, message="Save file as ...", defaultDir=os.getcwd(), 
+            defaultFile="clean", wildcard=wildcard, style=wx.SAVE
+            )
+        
+        dlg.SetFilterIndex(0)
+        
+        if dlg.ShowModal() == wx.ID_OK:
+            path = dlg.GetPath()
+            
+            fp = open(path, 'wb')
+            writer = csv.writer(fp)
+            writer.writerows(data.outdata())
+            fp.close()
+        
+        dlg.Destroy()
 
 # end of class MainFrame
 
