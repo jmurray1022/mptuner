@@ -78,8 +78,8 @@ class DataObj:
         print r; print numframe
         
         #The data we skip due to frame size is all masked
-        self.colmask[0:r-1,:]=ones(self.colmask[0:r-1,:].shape,dtype=bool)
-        self.resmask[0:r-1,:]=ones(self.resmask[0:r-1,:].shape,dtype=bool)
+        self.colmask[0:r,:]=ones(self.colmask[0:r,:].shape,dtype=bool)
+        self.resmask[0:r,:]=ones(self.resmask[0:r,:].shape,dtype=bool)
         
         dlg = wx.ProgressDialog("Median polish", "Performing median polish algorithm", 
             maximum = numframe, style = wx.PD_APP_MODAL | wx.PD_SMOOTH | wx.PD_AUTO_HIDE)
@@ -94,23 +94,21 @@ class DataObj:
             
         dlg.Destroy()
     def outdata(self):
-        mask = zeros((self.data.shape[0],self.data.shape[1]))
-        mask[0,1] = 1
-        mask[0,2] = 1
-        mask[0,4] = 1
+        mask = ma.mask_or(self.colmask, self.resmask)
+        #mask[0,1] = 1
+        #mask[0,2] = 1
+        #mask[0,4] = 1
         #clean = ma.masked_array(data=self.data, mask = ma.mask_or(self.colmask, self.resmask), fill_value = "NA")
         clean = ma.masked_array(data=self.data, mask = mask, fill_value = "NA")
-        np.savetxt('out.csv', clean.filled(np.nan), delimiter = ",")
-
+        #np.savetxt('out.csv', clean.filled(np.nan), delimiter = ",")
         ldata = clean.filled(np.nan).tolist()
         for i, row in enumerate(ldata):
             for j, col in enumerate(row):
                 if np.isnan(ldata[i][j]): ldata[i][j] = "NA"
         fulldata = vstack((hstack((array(self.indname),self.colnames)), hstack((transpose(np.atleast_2d(self.ind)), ldata))))
-        writer = csv.writer(open("out2.csv", "wb"))
-        writer.writerows(fulldata)
-
-        return clean.filled(np.nan)
+        #writer = csv.writer(open("out2.csv", "wb"))
+        #writer.writerows(fulldata)
+        return fulldata
 #data=DataObj("data.csv")
 #data.read_data()
 #data.init_masks()
