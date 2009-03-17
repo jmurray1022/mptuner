@@ -104,7 +104,6 @@ class PlotOptions(wx.Frame):
 
 # end of class PlotOptions
 
-
 class GroupFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: GroupFrame.__init__
@@ -115,7 +114,6 @@ class GroupFrame(wx.Frame):
         self.GroupByCLB = wx.CheckListBox(self.panel_5, -1, choices=[])
         self.label_11 = wx.StaticText(self.panel_5, -1, "Result")
         self.ResultLC = wx.ListCtrl(self.panel_5, -1, style=wx.LC_REPORT|wx.SUNKEN_BORDER)
-
         self.__set_properties()
         self.__do_layout()
         # end wxGlade
@@ -123,6 +121,8 @@ class GroupFrame(wx.Frame):
         self.Bind(wx.EVT_CLOSE, self.onClose)
         self.PopulateFactors()
         self.SetCols()
+        for i in data.groupon:
+            self.GroupByCLB.Check(i)
         
     def onClose(self, event):
         frame_1.onFocus()
@@ -177,17 +177,20 @@ class GroupFrame(wx.Frame):
     def OnCBCheck(self, event):
         names=[]
         lst=[]
+        groupon = []
         for i, item in enumerate(data.factors):
             names.append(item)
             if self.GroupByCLB.IsChecked(i):
                 lst.append(data.settings[item])
+                groupon.append(i)
             else:
                 lst.append(["ALL"])
+        #print groupon
         data.groups=vstack(x for x in cprod(lst))
         data.groupnames=names
-        
-        print data.groupnames
-        print data.factors
+        data.groupon = groupon
+        #print data.groupnames
+        #print data.factors
         
         #result=[', '.join(data.groups[i]) for i in range(len(data.groups))]
         #print result
@@ -757,7 +760,7 @@ class MainFrame(wx.Frame):
         #print xl, yl
         if self.ShowBadTraces.IsChecked():
             self.draw_plot(data.ind, ma.masked_invalid(data.data[:,data.cols]),clear=True,bad_data=True)
-            plot=self.draw_plot(data.ind, ma.masked_array(data=data.data[:,data.cols], mask = ma.mask_or(data.colmask[:,data.cols], data.resmask[:,data.cols])),clear=False)
+            self.draw_plot(data.ind, ma.masked_array(data=data.data[:,data.cols], mask = ma.mask_or(data.colmask[:,data.cols], data.resmask[:,data.cols])),clear=False)
         else:
             self.draw_plot(data.ind, ma.masked_array(data=data.data[:,data.cols], mask = ma.mask_or(data.colmask[:,data.cols], data.resmask[:,data.cols])),clear=True)
         if self.ShowBadMarkers.IsChecked():
@@ -951,13 +954,6 @@ class MainFrame(wx.Frame):
 
     def OnLoadData(self, event): # wxGlade: MainFrame.<event_handler>
         wildcard = "Data file (*.csv)|*.csv"
-        # Create the dialog. In this case the current directory is forced as the starting
-        # directory for the dialog, and no default file name is forced. This can easilly
-        # be changed in your program. This is an 'open' dialog, and allows multitple
-        # file selections as well.
-        #
-        # Finally, if the directory is changed in the process of getting files, this
-        # dialog is set up to change the current working directory to the path chosen.
         dlg = wx.FileDialog(
             self, message="Choose a data file",
             defaultDir=os.getcwd(), 
@@ -965,9 +961,6 @@ class MainFrame(wx.Frame):
             wildcard=wildcard,
             style=wx.OPEN | wx.MULTIPLE | wx.CHANGE_DIR
             )
-        
-        # Show the dialog and retrieve the user response. If it is the OK response, 
-        # process the data.
         if dlg.ShowModal() == wx.ID_OK:
             global data
             # This returns a Python list of files that were selected.
@@ -975,8 +968,6 @@ class MainFrame(wx.Frame):
             #print paths
             data = DataObj(paths[0])
             data.cols = arange(data.data.shape[1])
-        # Destroy the dialog. Don't do this until you are done with it!
-        # BAD things can happen otherwise!
         dlg.Destroy()
 
         
@@ -985,15 +976,8 @@ class MainFrame(wx.Frame):
 
 if __name__ == "__main__":
 
-    #f=file('factordef.txt','r')
-    #for line in f.readlines():
-    #    exec(line)
-            
     app = wx.PySimpleApp(0)
     wx.InitAllImageHandlers()
-    #data = DataObj('35cm.csv')
-    #data.cols = arange(data.data.shape[1])
-    #data.data[4,1]=NaN
     frame_1 = MainFrame(None, -1, "")
     frame_1.panel_4.Hide()
     app.SetTopWindow(frame_1)

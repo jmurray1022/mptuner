@@ -18,6 +18,7 @@ class DataObj:
         self.groups=[]
         self.groupnames=[]
         self.group_cols=[]
+        self.groupon=[]
         
         self.read_data()
         self.init_masks()
@@ -33,6 +34,7 @@ class DataObj:
         if line[0]=='"':
             line=line.replace('"','')
         cn=line.rsplit(",")
+        self.indname = cn[0]
         self.colnames=np.array(cn[1:len(cn)])
         nc=len(self.colnames)
         self.colsettings=np.vstack([name.rsplit(".")] for name in self.colnames)
@@ -44,7 +46,7 @@ class DataObj:
             else:
                 return float(x)
         conv = dict( (k, missing_data) for k in range(nc+1) )
-        df = np.loadtxt(self.fname, delimiter = ',', converters = conv,skiprows=1)
+        df = np.loadtxt(self.fname, delimiter = ',', converters = conv, skiprows=1)
         self.ind=df[:,0]
         self.data=df[:,1:len(df[0,])]
         del df
@@ -91,7 +93,24 @@ class DataObj:
             dlg.Update(i+1)
             
         dlg.Destroy()
-    
+    def outdata(self):
+        mask = zeros((self.data.shape[0],self.data.shape[1]))
+        mask[0,1] = 1
+        mask[0,2] = 1
+        mask[0,4] = 1
+        #clean = ma.masked_array(data=self.data, mask = ma.mask_or(self.colmask, self.resmask), fill_value = "NA")
+        clean = ma.masked_array(data=self.data, mask = mask, fill_value = "NA")
+        np.savetxt('out.csv', clean.filled(np.nan), delimiter = ",")
+
+        ldata = clean.filled(np.nan).tolist()
+        for i, row in enumerate(ldata):
+            for j, col in enumerate(row):
+                if np.isnan(ldata[i][j]): ldata[i][j] = "NA"
+        fulldata = vstack((hstack((array(self.indname),self.colnames)), hstack((transpose(np.atleast_2d(self.ind)), ldata))))
+        writer = csv.writer(open("out2.csv", "wb"))
+        writer.writerows(fulldata)
+
+        return clean.filled(np.nan)
 #data=DataObj("data.csv")
 #data.read_data()
 #data.init_masks()
