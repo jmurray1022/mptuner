@@ -184,7 +184,7 @@ def resclean(x, res, ce):
     low=quantile(y,0.25)-ce*iqrange
     high=quantile(y,0.75)+ce*iqrange
     mask=ma.masked_outside(x,low,high).mask
-    if type(mask)==type(False):
+    if type(mask) == type(False):
         mask = zeros(x.shape,dtype=bool)
     return mask
     
