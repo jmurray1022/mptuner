@@ -3,6 +3,7 @@ import wx
 from support import *
 import numpy as np
 import matplotlib.numerix.ma as ma
+from time import time
 
 class DataObj:
     def __init__(self, fname):
@@ -78,13 +79,13 @@ class DataObj:
         print r; print numframe
         
         #The data we skip due to frame size is all masked
-        self.colmask[0:r,:]=ones(self.colmask[0:r,:].shape,dtype=bool)
-        self.resmask[0:r,:]=ones(self.resmask[0:r,:].shape,dtype=bool)
+        #self.colmask[0:r,:]=ones(self.colmask[0:r,:].shape,dtype=bool)
+        #self.resmask[0:r,:]=ones(self.resmask[0:r,:].shape,dtype=bool)
         
         dlg = wx.ProgressDialog("Median polish", "Performing median polish algorithm", 
             maximum = numframe, style = wx.PD_APP_MODAL | wx.PD_SMOOTH | wx.PD_AUTO_HIDE)
   
-        for i in range(0,numframe):
+        for i in range(numframe):
             low=r+i*frame
             high=r+(i+1)*frame
             polish=medpolish(self.data[low:high,cols], eps=eps, maxiter=maxiter)
@@ -93,24 +94,59 @@ class DataObj:
             dlg.Update(i+1)
             
         dlg.Destroy()
+    
+    def do_running_polish(self, lag, cols=array([]), cs=1.5, ce=3.0, eps=0.01, maxiter=100, repolish=True):
+        nrow = self.data.shape[0]
+        lag = 7
+        iter = nrow - 2 * lag
+        
+        if cols==array([]):
+            cols=arange(0,ncol)
+            
+        dlg = wx.ProgressDialog("Median polish", "Performing median polish algorithm", 
+            maximum = iter, style = wx.PD_APP_MODAL | wx.PD_SMOOTH | wx.PD_AUTO_HIDE)
+            
+        #test = [i for i in range(iter)]
+        #print test
+        #def f(x):
+        #    return x + cs
+        #f(1)
+        #print map(f, test)
+        
+        #start = time()
+        polishtime = 0
+        colcleantime = 0
+        
+        for i in range(iter):
+            low = i
+            high = i + 2 * lag + 1
+            start = time()
+            polish = medpolish(self.data[low:high,cols], eps=eps, maxiter=maxiter)
+            polishtime += time() - start
+            start = time()
+            self.colmask[i+lag,cols] = rcolclean(self.data[low:high,cols], polish['col'], cs)
+            colcleantime += time() - start
+            self.resmask[i+lag,cols]=rresclean(self.data[low:high,cols], lag, polish['res'], ce)
+            dlg.Update(i+1)
+        
+        #def f(frame):
+        #    self.colmask[frame[0]+lag,cols] = rcolclean(self.data[frame[0]:frame[1],cols], medpolish(self.data[frame[0]:frame[1],cols], eps=eps, maxiter=maxiter)['col'], cs)
+        #frames = [(i,i+2*lag+1) for i in range(iter)]
+        #map(f, frames)
+            
+        dlg.Destroy()
+
+        print "Polish time:"; print polishtime
+        print "Colclean time:"; print colcleantime
+    
     def outdata(self):
         mask = ma.mask_or(self.colmask, self.resmask)
-        #mask[0,1] = 1
-        #mask[0,2] = 1
-        #mask[0,4] = 1
-        #clean = ma.masked_array(data=self.data, mask = ma.mask_or(self.colmask, self.resmask), fill_value = "NA")
         clean = ma.masked_array(data=self.data, mask = mask, fill_value = "NA")
-        #np.savetxt('out.csv', clean.filled(np.nan), delimiter = ",")
         ldata = clean.filled(np.nan).tolist()
+        
         for i, row in enumerate(ldata):
             for j, col in enumerate(row):
                 if np.isnan(ldata[i][j]): ldata[i][j] = "NA"
+                
         fulldata = vstack((hstack((array(self.indname),self.colnames)), hstack((transpose(np.atleast_2d(self.ind)), ldata))))
-        #writer = csv.writer(open("out2.csv", "wb"))
-        #writer.writerows(fulldata)
         return fulldata
-#data=DataObj("data.csv")
-#data.read_data()
-#data.init_masks()
-#data.do_seq_polish(8)
-#data.polish()
