@@ -20,6 +20,34 @@ import EnhancedStatusBar as ESB
 import os
 import pickle
 
+ver = "1.11"
+
+class MyFrame1(wx.Frame):
+    def __init__(self, *args, **kwds):
+        # begin wxGlade: MyFrame1.__init__
+        kwds["style"] = wx.DEFAULT_FRAME_STYLE
+        wx.Frame.__init__(self, *args, **kwds)
+
+        self.__set_properties()
+        self.__do_layout()
+        # end wxGlade
+
+    def __set_properties(self):
+        # begin wxGlade: MyFrame1.__set_properties
+        self.SetTitle("frame_2")
+        # end wxGlade
+
+    def __do_layout(self):
+        # begin wxGlade: MyFrame1.__do_layout
+        sizer_20 = wx.BoxSizer(wx.VERTICAL)
+        self.SetSizer(sizer_20)
+        sizer_20.Fit(self)
+        self.Layout()
+        # end wxGlade
+
+# end of class MyFrame1
+
+
 class PlotOptions(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: PlotOptions.__init__
@@ -93,7 +121,9 @@ class PlotOptions(wx.Frame):
         # end wxGlade
 
     def OnApply(self, event): # wxGlade: PlotOptions.<event_handler>
-        frame_1.titletext = frame_1.fig.suptitle(self.TitleTB.GetValue())
+        frame_1.axes.set_title(self.TitleTB.GetValue())
+        frame_1.axes.set_xlabel(self.XAxis.GetValue())
+        frame_1.axes.set_ylabel(self.YAxis.GetValue())
         frame_1.canvas.draw()
         
 
@@ -103,7 +133,6 @@ class PlotOptions(wx.Frame):
         
 
 # end of class PlotOptions
-
 class GroupFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: GroupFrame.__init__
@@ -222,7 +251,6 @@ class GroupFrame(wx.Frame):
         
 
 # end of class GroupFrame
-
 class DataImportFrame(wx.Frame):
     def __init__(self, *args, **kwds):
         # begin wxGlade: DataImportFrame.__init__
@@ -421,7 +449,6 @@ class DataImportFrame(wx.Frame):
         
 
 # end of class DataImportFrame
-
 class CustomTreeCtrl(CT.CustomTreeCtrl):
 
     def __init__(self, parent, id=wx.ID_ANY, pos=wx.DefaultPosition,
@@ -491,7 +518,9 @@ class MainFrame(wx.Frame):
         kwds["style"] = wx.DEFAULT_FRAME_STYLE
         wx.Frame.__init__(self, *args, **kwds)
         self.panel_6 = wx.Panel(self, -1)
+        self.panel_12_copy = wx.Panel(self, -1)
         self.panel_2 = wx.Panel(self, -1)
+        self.panel_12 = wx.Panel(self, -1)
         self.panel_3 = wx.Panel(self, -1)
         self.panel_4 = wx.Panel(self, -1)
         
@@ -534,10 +563,12 @@ class MainFrame(wx.Frame):
         # Menu Bar end
         self.canvas = FigCanvas(self.panel_3, -1, self.fig)
         self.toolbar = NavigationToolbar(self.canvas, )
-        self.label_4 = wx.StaticText(self.panel_2, -1, "Group:      ")
+        self.panel_13 = wx.Panel(self.panel_2, -1)
+        self.label_4 = wx.StaticText(self.panel_2, -1, "  Group:      ")
         self.choice_1 = wx.Choice(self.panel_2, -1, choices=[])
-        self.label_9_copy = wx.StaticText(self.panel_6, -1, "Method:")
-        self.MethodChoice = wx.Choice(self.panel_6, -1, choices=["Sequential", "Running"])
+        self.panel_13_copy = wx.Panel(self.panel_2, -1)
+        self.panel_9 = wx.Panel(self.panel_6, -1)
+        self.Method = wx.RadioBox(self.panel_6, -1, "Method", choices=["Sequential", "Running"], majorDimension=0, style=wx.RA_SPECIFY_ROWS)
         self.label_7_copy = wx.StaticText(self.panel_6, -1, "Frame: ")
         self.FrameCtrl = wx.SpinCtrl(self.panel_6, -1, "16", min=0, max=100)
         self.label_8_copy = wx.StaticText(self.panel_6, -1, "Lag: ")
@@ -549,6 +580,7 @@ class MainFrame(wx.Frame):
         self.ceSlider = wx.Slider(self.panel_6, -1, 3000, 0, 10000)
         self.ceText = masked.NumCtrl(self.panel_6, -1, "0")
         self.Recalc = wx.Button(self.panel_6, -1, "Recalculate")
+        self.panel_10 = wx.Panel(self.panel_6, -1)
 
         self.__set_properties()
         self.__do_layout()
@@ -601,39 +633,43 @@ class MainFrame(wx.Frame):
         # begin wxGlade: MainFrame.__set_properties
         self.SetTitle("MPTuner 0.90")
         self.canvas.SetBackgroundColour(wx.Colour(255, 255, 255))
-        self.MethodChoice.SetSelection(0)
+        self.choice_1.SetMinSize((580, 21))
+        self.Method.SetMinSize((140, 60))
+        self.Method.SetSelection(0)
         self.label_7_copy.SetMinSize((60, 17))
         self.FrameCtrl.SetMinSize((55, 27))
         self.label_8_copy.SetMinSize((60, 17))
         self.LagCtrl.SetMinSize((55, 27))
         self.label_6_copy.SetMinSize((76, 17))
-        self.csSlider.SetMinSize((100, -1))
+        self.csSlider.SetMinSize((140, -1))
         self.csSlider.SetSize((200,-1))
         self.csText.SetMinSize((50, 27))
         self.csText.SetFractionWidth(3)
         self.csText.SetIntegerWidth(2)
         self.csText.SetValue(1.5)
         self.label_5_copy.SetMinSize((76, 17))
-        self.ceSlider.SetMinSize((100, -1))
+        self.ceSlider.SetMinSize((140, -1))
         self.ceText.SetMinSize((50, 27))
         self.ceText.SetFractionWidth(3)
         self.ceText.SetIntegerWidth(2)
         self.ceText.SetValue(3.0)
         # end wxGlade
-        
+        self.SetTitle("MPTuner " + ver)
 
     def __do_layout(self):
         # begin wxGlade: MainFrame.__do_layout
         MainSizer = wx.BoxSizer(wx.VERTICAL)
-        sizer_2_copy = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_3 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_5 = wx.BoxSizer(wx.VERTICAL)
         sizer_5_copy = wx.BoxSizer(wx.VERTICAL)
         sizer_6_copy = wx.BoxSizer(wx.HORIZONTAL)
         sizer_7_copy = wx.BoxSizer(wx.HORIZONTAL)
         sizer_8_copy = wx.BoxSizer(wx.VERTICAL)
         sizer_10_copy = wx.BoxSizer(wx.HORIZONTAL)
         sizer_9_copy = wx.BoxSizer(wx.HORIZONTAL)
-        sizer_11_copy = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_22_copy = wx.BoxSizer(wx.HORIZONTAL)
         sizer_19 = wx.BoxSizer(wx.HORIZONTAL)
+        sizer_22 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_13 = wx.BoxSizer(wx.HORIZONTAL)
         sizer_12_copy_copy = wx.BoxSizer(wx.VERTICAL)
         sizer_29 = wx.BoxSizer(wx.HORIZONTAL)
@@ -644,23 +680,29 @@ class MainFrame(wx.Frame):
         self.panel_3.SetSizer(sizer_12_copy_copy)
         sizer_13.Add(self.panel_3, 1, wx.EXPAND, 0)
         MainSizer.Add(sizer_13, 1, wx.EXPAND, 0)
+        sizer_22.Add((20, 10), 0, 0, 0)
+        self.panel_12.SetSizer(sizer_22)
+        MainSizer.Add(self.panel_12, 0, wx.EXPAND, 0)
+        sizer_19.Add(self.panel_13, 1, wx.EXPAND, 0)
         sizer_19.Add(self.label_4, 0, 0, 0)
-        sizer_19.Add(self.choice_1, 1, 0, 0)
+        sizer_19.Add(self.choice_1, 0, 0, 0)
+        sizer_19.Add(self.panel_13_copy, 1, wx.EXPAND, 0)
         self.panel_2.SetSizer(sizer_19)
         MainSizer.Add(self.panel_2, 0, wx.EXPAND, 0)
-        sizer_11_copy.Add(self.label_9_copy, 0, 0, 0)
-        sizer_11_copy.Add((10, 20), 0, 0, 0)
-        sizer_11_copy.Add(self.MethodChoice, 0, 0, 0)
-        sizer_2_copy.Add(sizer_11_copy, 0, wx.SHAPED, 0)
-        sizer_2_copy.Add((20, 20), 0, 0, 0)
+        sizer_22_copy.Add((20, 10), 0, 0, 0)
+        self.panel_12_copy.SetSizer(sizer_22_copy)
+        MainSizer.Add(self.panel_12_copy, 0, wx.EXPAND, 0)
+        sizer_3.Add(self.panel_9, 1, wx.EXPAND, 0)
+        sizer_3.Add(self.Method, 0, 0, 0)
+        sizer_3.Add((10, 20), 0, 0, 0)
         sizer_9_copy.Add(self.label_7_copy, 0, 0, 0)
         sizer_9_copy.Add(self.FrameCtrl, 0, 0, 0)
         sizer_8_copy.Add(sizer_9_copy, 1, wx.EXPAND, 0)
         sizer_10_copy.Add(self.label_8_copy, 0, 0, 0)
         sizer_10_copy.Add(self.LagCtrl, 0, 0, 0)
         sizer_8_copy.Add(sizer_10_copy, 1, wx.EXPAND, 0)
-        sizer_2_copy.Add(sizer_8_copy, 0, wx.EXPAND, 0)
-        sizer_2_copy.Add((20, 20), 0, 0, 0)
+        sizer_3.Add(sizer_8_copy, 0, wx.EXPAND, 0)
+        sizer_3.Add((10, 20), 0, 0, 0)
         sizer_7_copy.Add(self.label_6_copy, 0, 0, 0)
         sizer_7_copy.Add(self.csSlider, 0, 0, 0)
         sizer_7_copy.Add(self.csText, 0, 0, 0)
@@ -669,10 +711,12 @@ class MainFrame(wx.Frame):
         sizer_6_copy.Add(self.ceSlider, 0, 0, 0)
         sizer_6_copy.Add(self.ceText, 0, 0, 0)
         sizer_5_copy.Add(sizer_6_copy, 1, wx.EXPAND, 0)
-        sizer_2_copy.Add(sizer_5_copy, 0, wx.EXPAND, 0)
-        sizer_2_copy.Add((20, 20), 0, 0, 0)
-        sizer_2_copy.Add(self.Recalc, 0, wx.ALIGN_RIGHT|wx.ALIGN_BOTTOM, 0)
-        self.panel_6.SetSizer(sizer_2_copy)
+        sizer_3.Add(sizer_5_copy, 0, wx.EXPAND, 0)
+        sizer_3.Add((10, 20), 0, 0, 0)
+        sizer_5.Add(self.Recalc, 0, wx.ALIGN_BOTTOM, 0)
+        sizer_3.Add(sizer_5, 0, wx.EXPAND, 0)
+        sizer_3.Add(self.panel_10, 1, wx.EXPAND, 0)
+        self.panel_6.SetSizer(sizer_3)
         MainSizer.Add(self.panel_6, 0, wx.EXPAND, 0)
         self.SetSizer(MainSizer)
         MainSizer.Fit(self)
@@ -696,7 +740,8 @@ class MainFrame(wx.Frame):
         #    else:
             self.axes.plot(x,y, picker=True, label="good")
         elif scatter:
-            self.axes.plot(x,y,linestyle="None",marker='o',markeredgecolor='white',markerfacecolor='black',markersize=4, picker=True, label="scatter")
+            #self.axes.plot(x,y,linestyle="None",marker='o',markeredgecolor='white',markerfacecolor='black',markersize=4, picker=True, label="scatter")
+            self.axes.plot(x,y,linestyle="None",marker='o',markerfacecolor='black',markersize=2, picker=True, label="scatter")
         #if not self.initplot:
         #    self.axes.set_ylim((-5.,-1.))
         #else:
@@ -705,53 +750,54 @@ class MainFrame(wx.Frame):
         
     def on_pick(self, event):
         thisline = event.artist
-        print thisline
         xdata = thisline.get_xdata()
         ydata = thisline.get_ydata()
         ind = event.ind
         col=thisline.get_c()
         label = thisline.get_label()
-        print event.ind
-        print ydata
-        #print ydata
         if label=="good":
             masked=ma.masked_invalid(data.data[:,data.cols])
         elif label=="bad":
             masked=ma.masked_array(data=data.data[:,data.cols], mask = ma.mask_or(data.colmask[:,data.cols], data.resmask[:,data.cols]))
         elif label=="scatter":
             masked=ma.masked_array(data=data.data[:,data.cols], mask = invert(ma.mask_or(data.colmask[:,data.cols], data.resmask[:,data.cols])))
-            print xdata, ydata
         colname_sub=data.colnames[data.cols]
         for i in arange(len(masked[0,:])):
             if (ydata==masked[:,i]).all(): 
                 print i
                 match=i
-                #print colname_sub[i]
                 self.statusbar.SetStatusText(colname_sub[i],2)
                 self.statusbarText = wx.StaticText(self.statusbar, -1, "     ")
                 self.statusbarText.SetBackgroundColour(col)
                 self.statusbar.AddWidget(self.statusbarText, pos = 1)
 
     def on_recalc_push(self, event): # wxGlade: MainFrame.<event_handler>
-        data.do_seq_polish(self.FrameCtrl.GetValue(), cs = self.csText.GetValue(), ce = self.ceText.GetValue(), cols=data.cols)
-        self.BuildPlot()
         i = self.choice_1.GetSelection()
+        method = self.Method.GetSelection()
+        print method
+        if i != 0:
+            if method == 0:
+                data.do_seq_polish(self.FrameCtrl.GetValue(), cs = self.csText.GetValue(), ce = self.ceText.GetValue(), cols=data.cols)
+            if method == 1:
+                data.do_running_polish(self.FrameCtrl.GetValue(), cs = self.csText.GetValue(), ce = self.ceText.GetValue(), cols=data.cols)
+            
+        self.BuildPlot()
         if i != -1:
+            ind = self.choice_1.GetClientData(i)['index']
             s = self.choice_1.GetClientData(i)
             #s['method'] = self.
-            s['method'] = self.MethodChoice.GetSelection()
+            s['method'] = self.Method.GetSelection()
             s['frame'] = self.FrameCtrl.GetValue()
             s['lag'] = self.LagCtrl.GetValue()
             s['cs'] = self.csText.GetValue()
             s['ce'] = self.ceText.GetValue()
             self.choice_1.SetClientData(i, s)
         
-        
-        
     def BuildPlot(self):
         yl=self.axes.get_ylim()#.copy()
         xl=self.axes.get_xlim()#.copy()
-        #print xl, yl
+        print xl, yl
+        print "stop"
         if self.ShowBadTraces.IsChecked():
             self.draw_plot(data.ind, ma.masked_invalid(data.data[:,data.cols]),clear=True,bad_data=True)
             self.draw_plot(data.ind, ma.masked_array(data=data.data[:,data.cols], mask = ma.mask_or(data.colmask[:,data.cols], data.resmask[:,data.cols])),clear=False)
@@ -760,11 +806,19 @@ class MainFrame(wx.Frame):
         if self.ShowBadMarkers.IsChecked():
             self.draw_plot(data.ind, ma.masked_array(data=data.data[:,data.cols], mask = invert(ma.mask_or(data.colmask[:,data.cols], data.resmask[:,data.cols]))),clear=False,scatter=True)
         if self.initplot:
+            y = self.axes.get_ylim()
+            buffer = 0.05 * (y[1] - y[0])
+            y[0] = y[0] - buffer
+            self.axes.set_ylim(y)
             self.initplot=False
         else:
             self.axes.set_ylim(yl)
             self.axes.set_xlim(xl)
         #self.fig.suptitle('Polished data (cs=%s, ce=%s)'%(self.csText.GetValue(),self.ceText.GetValue()), fontsize=12)
+        #for label in self.axes.get_xticklabels():
+        # label is a Text instance
+        #    label.set_rotation(45)
+
         self.canvas.draw()        
 
     def onClose(self, event): # wxGlade: MainFrame.<event_handler>
@@ -937,17 +991,30 @@ class MainFrame(wx.Frame):
         else:
             data.cols = data.group_cols[event.GetClientData()['index']]   
         i = event.GetSelection()
-        if i != -1:
+        if i == 0:
+            self.LagCtrl.Disable()
+            self.FrameCtrl.Disable()
+            self.csText.Disable()
+            self.ceText.Disable()
+            self.Method.Disable()
+            
+        if i > 0: # !=1
             s = event.GetClientData()
-            self.MethodChoice.SetSelection(s['method'])
+            self.Method.SetSelection(s['method'])
             self.FrameCtrl.SetValue(s['frame'])
             self.LagCtrl.SetValue(s['lag'])
             self.csText.SetValue(s['cs'])
             self.ceText.SetValue(s['ce'])
+            
+            self.LagCtrl.Enable()
+            self.FrameCtrl.Enable()
+            self.csText.Enable()
+            self.ceText.Enable()
+            self.Method.Enable()
         
-
     def OnLoadData(self, event): # wxGlade: MainFrame.<event_handler>
         wildcard = "Data file (*.csv)|*.csv"
+        self.statusbar.SetStatusText("Loading data...",0)
         dlg = wx.FileDialog(
             self, message="Choose a data file",
             defaultDir=os.getcwd(), 
@@ -960,8 +1027,23 @@ class MainFrame(wx.Frame):
             # This returns a Python list of files that were selected.
             paths = dlg.GetPaths()
             #print paths
-            data = DataObj(paths[0])
-            data.cols = arange(data.data.shape[1])
+            try:
+                data = DataObj(paths[0])
+                data.cols = arange(data.data.shape[1])
+                self.statusbar.SetStatusText("Loaded " + paths[0] + " successfully.",0)
+                #Plot the data
+                self.draw_plot(data.ind, ma.masked_invalid(data.data[:,:]),clear=True)#,bad_data=True)
+                #Fix the axis labels
+                y = self.axes.get_ylim()
+                buffer = 0.05 * (y[1] - y[0])
+                y[0] = y[0] - buffer
+                self.axes.set_ylim(y)
+            except:
+                dial = wx.MessageDialog(None, 'Error loading file', 'Error', wx.OK | 
+                    wx.ICON_ERROR)
+                dial.ShowModal()
+                self.statusbar.SetStatusText("Load data failed.",0)
+
         dlg.Destroy()
 
         
@@ -985,7 +1067,6 @@ class MainFrame(wx.Frame):
             fp.close()
         
         dlg.Destroy()
-
 # end of class MainFrame
 
 if __name__ == "__main__":
