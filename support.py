@@ -91,8 +91,7 @@ def medpolish(z,eps=0.01,maxiter=10):
 
         #subtract the row medians from the rows of the matrix
         #and add them to r
-        #rdelta=np.median(x,1)
-        rdelta=np.apply_along_axis(quantile,1,x,0.5)
+        np.median(x,1)
         x=x-rdelta[:,newaxis]
         r=r+rdelta
 
@@ -103,8 +102,7 @@ def medpolish(z,eps=0.01,maxiter=10):
 
         #subtract the column medians from the columns of the matrix
         #and add them to c
-        #cdelta=np.median(x,0)
-        cdelta=np.apply_along_axis(quantile,0,x,0.5)
+        cdelta = np.median(x,0)
         x=x-cdelta
         c=c+cdelta
 
@@ -131,31 +129,11 @@ def medpolish(z,eps=0.01,maxiter=10):
         result={"iter":i-1, "overall":t, "row":r, "col":c, "res":x}
     else:
         print "median polish failed to converge. increase maxiter?"
-        result={"iter":i-1, "overall":t, "row":r, "col":c, "res":x}
+        #result={"iter":i-1, "overall":t, "row":r, "col":c, "res":x}
     return result
 
 ##########################################################################
 # End medpolish function
-##########################################################################
-
-##########################################################################
-# Begin colclean (column effect clean) function
-##########################################################################
-
-def colcleanold(arr, col_eff, cs):
-    '''Perform the column cleaning'''
-    low_cs=quantile(col_eff,0.25)-cs*iqr(col_eff)
-    high_cs=quantile(col_eff,0.75)+cs*iqr(col_eff)
-
-    colkill=union1d(where(col_eff<low_cs)[0],where(col_eff>high_cs)[0])
-
-    polished_data=ma.array(arr)
-    polished_data.mask=ma.make_mask_none(polished_data.shape)
-    polished_data.mask[:,colkill]=ones(polished_data.mask[:,colkill].shape,dtype=bool)
-    result={"pol":polished_data, "ckill":colkill}
-    return result
-##########################################################################
-# End colclean (column effect clean) function
 ##########################################################################
 
 ##########################################################################
@@ -171,6 +149,15 @@ def colclean(x, col_eff, cs):
     mask[:,colkill]=ones(mask[:,colkill].shape,dtype=bool)
     return mask
     
+def rcolclean(x, col_eff, cs):
+    iqrange=iqr(col_eff)
+    low=quantile(col_eff,0.25)-cs*iqrange
+    high=quantile(col_eff,0.75)+cs*iqrange
+    colkill=where((col_eff<low)|(col_eff>high))
+    mask=ma.make_mask_none(x.shape[1])
+    mask[colkill]=ones(mask[colkill].shape, dtype=bool)
+    return mask
+    
 ##########################################################################
 # End colclean (column effect clean) function
 ##########################################################################
@@ -184,9 +171,19 @@ def resclean(x, res, ce):
     low=quantile(y,0.25)-ce*iqrange
     high=quantile(y,0.75)+ce*iqrange
     mask=ma.masked_outside(x,low,high).mask
-    if type(mask) == type(False):
-        mask = zeros(x.shape,dtype=bool)
+    #if mask.dtype == np.dtype('bool'):
+    #    mask = zeros(x.shape,dtype=bool)
     return mask
+    
+def rresclean(x, lag, res, ce):
+    y=x.ravel()
+    iqrange=iqr(y)
+    low=quantile(y,0.25)-ce*iqrange
+    high=quantile(y,0.75)+ce*iqrange
+    mask=ma.masked_outside(x,low,high).mask
+    #if mask.dtype == np.dtype('bool'):
+    #    mask = zeros(x.shape,dtype=bool)
+    return mask[lag,:]
     
 #http://automatthias.wordpress.com/2007/04/28/cartesian-product-of-multiple-sets/
 
